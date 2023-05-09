@@ -13,12 +13,14 @@ export default function Enrollment() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const token = JSON.parse(localStorage.getItem('myToken'));
+  
 
   async function createAddress(e){
     e.preventDefault();
 
+
     try {
-      const result = await postAddress(street, neighborhood, city, state, number, token);
+     const result = await postAddress(street, neighborhood, city, state, number, token);
       console.log(result);
       navigate("/products");
 

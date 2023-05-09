@@ -1,8 +1,7 @@
-import { useState } from "react";
 import styled from "styled-components";
 
 export default function ProductsDivision({ i, setIdProduct, setInfosProduct }) {
-    console.log(i);
+
 
     function addProduct() {
         setIdProduct(i.id);
@@ -18,7 +17,7 @@ export default function ProductsDivision({ i, setIdProduct, setInfosProduct }) {
                 </ImageProduct>
                 <ProductDescription> {i.productName}</ProductDescription>
                 <Subtext>
-                    <ProductPrice>R${i.price / 100}</ProductPrice>
+                    <ProductPrice>R${(i.price / 100).toFixed(2).toString().replace('.', ',')}</ProductPrice>
                     <AddProduct>+</AddProduct>
                 </Subtext>
             </ProductBox>

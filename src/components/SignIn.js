@@ -5,13 +5,16 @@ import { useContext, useState } from "react";
 import { signIn } from "../services/authApi";
 import { toast } from "react-toastify";
 import UserContext from "../contexts/contextApi";
+import { findByAddressId } from "../services/addresApi";
+import jwtDecode from "jwt-decode";
 
 export default function SignIn() {
   const navigate = useNavigate();
   const { setUserData } = useContext(UserContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  
+  
   const user = {
     email, password
   }
@@ -23,7 +26,18 @@ export default function SignIn() {
       const result = await signIn(user);
       setUserData(result)
       localStorage.setItem('myToken', JSON.stringify(result));
-      navigate("/enrollment");
+
+      const token = JSON.parse(localStorage.getItem('myToken'));
+      const { userId } = jwtDecode(token);
+
+      const addressExists = await findByAddressId(token, userId);
+      
+      if(addressExists.length !== 0 ){
+        navigate("/products");
+      } else{
+        navigate("/enrollment");
+      }
+      
 
     } catch (err) {
       console.log(err);

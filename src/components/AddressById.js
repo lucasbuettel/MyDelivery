@@ -8,10 +8,8 @@ export default function AddressByid({info}){
     const navigate = useNavigate();
 
     function adressSelected(){
-        console.log(info)
         setAddressSelected(info);
-        navigate("/products")
-
+        navigate("/products");
     }
 
     return(

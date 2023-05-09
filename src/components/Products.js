@@ -1,11 +1,12 @@
 import styled from "styled-components";
 import Address from "./Address";
-import { getProductsById, getProductsType } from "../services/productApi";
-import { useContext, useEffect, useState } from "react";
+import { getProductsByTypeId, getProductsType } from "../services/productApi";
+import { useEffect, useState } from "react";
 import TypeOfProduct from "./TypeOfProduct";
 import ProductsDivision from "./ProductsDivision";
-import UserContext from "../contexts/contextApi";
 import { FaShoppingCart } from "react-icons/fa";
+import { postCart } from "../services/cartApi";
+import jwtDecode from "jwt-decode";
 
 
 export default function Products() {
@@ -16,7 +17,8 @@ export default function Products() {
     const [idProduct, setIdProduct] = useState(0);
     const [infosProduct, setInfosProduct] = useState([]);
     const [count, setCount] = useState(0);
-    const { amount, setAmount } = useContext(UserContext);
+    const { userId } = jwtDecode(token);
+    let priceTotal = ((infosProduct.price) * count);
 
     useEffect(() => {
         async function getProductsTypeId() {
@@ -33,7 +35,8 @@ export default function Products() {
 
         async function getProducts() {
             try {
-                const result = await getProductsById(token, idProductType);
+                const result = await getProductsByTypeId(token, idProductType);
+                /* console.log(result); */
                 setProducts(result);
 
             } catch (err) {
@@ -43,8 +46,23 @@ export default function Products() {
         }
         getProducts();
 
-    }, [idProductType])
+        
+    }, [idProductType]);
 
+
+    
+    async function postInCart(e){
+        e.preventDefault();
+        try{
+            const result = await postCart(Number(idProduct), userId, count, priceTotal, token);
+            backScreen();
+
+        }catch(err){
+            console.log(err);
+            console.log("Algo deu errado, tente novamente");
+        }
+
+    }
 
     const increment = () => {
         setCount(count + 1);
@@ -54,9 +72,11 @@ export default function Products() {
         setCount(count - 1);
     };
 
-    function tirarTela() {
+    function backScreen() {
         setIdProduct(0);
+        setCount(0);
     }
+
 
     return (<>
 
@@ -64,15 +84,15 @@ export default function Products() {
 
             <AmountProduct  idProduct={idProduct}>
                 <SelectProduct>
-                    <Exit onClick={tirarTela}>X</Exit>
+                    <Exit onClick={backScreen}>X</Exit>
                     <h1>{infosProduct.productName}</h1>
                     <Counter>
                         <button onClick={decrement}>-</button>
                         <h1>{count}</h1>
                         <button onClick={increment}>+</button>
                     </Counter>
-                    <TotalPrice>Preço Total: R$ {(infosProduct.price) * count / 100}</TotalPrice>
-                    <button>Adicionar ao Carrinho <FaShoppingCart /></button>
+                    <TotalPrice>Preço Total: R$ {(priceTotal/100).toFixed(2).toString().replace('.', ',')}</TotalPrice>
+                    <button onClick={postInCart}>Adicionar ao Carrinho <FaShoppingCart /></button>
                 </SelectProduct>
             </AmountProduct>
             <Address />

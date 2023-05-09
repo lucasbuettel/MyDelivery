@@ -9,8 +9,17 @@ export async function getProductsType(token) {
   return response.data;
 };
 
-export async function getProductsById(token, productTypeId) {
+export async function getProductsByTypeId(token, productTypeId) {
     const response = await api.get(`/products/${productTypeId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  };
+
+  export async function getProductsById(token, productId) {
+    const response = await api.get(`/products/info/${productId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
