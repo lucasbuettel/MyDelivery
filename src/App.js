@@ -9,6 +9,7 @@ import Cart from "./components/Cart";
 import { UserProvider } from "./contexts/contextApi";
 import SelectAddress from "./components/SelectAddress";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
   return (

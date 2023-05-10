@@ -8,7 +8,8 @@ import { ProductsInCart } from "./ProductsInCart";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../contexts/contextApi";
-import { BiArrowFromRight } from "react-icons/bi";
+import { BiExit } from "react-icons/bi";
+import { BsArrowLeft } from "react-icons/bs";
 
 
 export default function Cart() {
@@ -19,7 +20,10 @@ export default function Cart() {
     const navigate = useNavigate();
     const address = JSON.parse(localStorage.getItem('addressSelected'));
     const { setOriginPage, setAmountInCart } = useContext(UserContext);
-    
+    let totalPriceCart = (productsInCart.reduce((sum, info) => { 
+        let priceTotal = sum + info.totalPrice;
+        return priceTotal;
+        }, 0)/100).toFixed(2).toString().replace('.', ',');
 
     useEffect(() => {
         
@@ -29,6 +33,7 @@ export default function Cart() {
                 setOriginPage(1);
                 setAmountInCart(result.length)
                 setProductsInCart(result);
+                /* console.log("aquii", productsInCart); */
             } catch (err) {
                 console.log(err);
                 console.log("Algo deu errado, tente novamente");
@@ -36,15 +41,36 @@ export default function Cart() {
 
         }
         getProductsByUser();
+       
     }, [productsInCart]);
 
+    
+
+    function exitApp(){
+        localStorage.clear();
+        navigate("/");
+    }
+
+    
+
+    function goToWhatsApp(){
+        const message = `Olá, gostaria de fazer o pedido: \n
+        - Itens do pedido: ${productsInCart.map((i)=>{return(`${i.products.productName}, Quantidade: ${i.amountProduct} \n`)})} \n
+        Total: R$${totalPriceCart} \n
+        Pagamento na Entrega!` ;
+        const encode = encodeURIComponent(message);
+
+    window.open(`https://wa.me/5532991659141?text=${encode}`);
+    
+    }
+    
     return (
         <Container>
             <Header>
-                <BiArrowFromRight onClick={()=>navigate("/products")}/><a>Carrinho</a>
+                <ArrowLeft><BsArrowLeft onClick={()=>navigate("/products")} size={30}/></ArrowLeft><a>Carrinho</a><BiExit onClick={exitApp} size={30} style={{position: "absolute", right: '20', top:'22'}}/>
             </Header>
             <CartContains>
-                {productsInCart.map((info) => <ProductsInCart key={info.id} info={info} setTotalPriceInCart={setTotalPriceInCart} totalPriceInCart={totalPriceInCart} />)}
+                {productsInCart.map((info) => <ProductsInCart key={info.id} info={info} setTotalPriceInCart={setTotalPriceInCart} totalPriceInCart={totalPriceInCart}/>)}
             </CartContains>
 
             <ConfirmAdress>
@@ -53,13 +79,10 @@ export default function Cart() {
                 </ThisAddres>
             </ConfirmAdress>
             <Total>
-                <a>O Valor total é: R${(productsInCart.reduce((sum, info) => { 
-                    let priceTotal = sum + info.totalPrice;
-                    return priceTotal;
-                    }, 0)/100).toFixed(2).toString().replace('.', ',')}</a>
+                <a>O Valor total é: R${totalPriceCart}</a>
             </Total>
             <ContainerButton>
-                <ConfirmButton>
+                <ConfirmButton onClick ={goToWhatsApp}>
                     <a>Confirmar Pedido!</a>
                 </ConfirmButton>
             </ContainerButton>
@@ -168,4 +191,9 @@ margin-top:1px;
 margin-left:5px;
 color: red;
 
+`
+const ArrowLeft = styled.div`
+position: absolute;
+left: 25px;
+top:25px;
 `

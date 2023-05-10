@@ -5,23 +5,23 @@ import { getProductsById } from "../services/productApi";
 import { useState } from "react";
 import { deleteProductInCart } from "../services/cartApi";
 
-export function ProductsInCart({ info, setTotalPriceInCart, totalPriceInCart  }) {
+export function ProductsInCart({ info, setTotalPriceInCart, totalPriceInCart }) {
     /* console.log(info) */
     const token = JSON.parse(localStorage.getItem('myToken'));
     const [infosProduct, setInfosProduct] = useState([])
     
     
     useEffect(() => {
-        setTotalPriceInCart(totalPriceInCart + info.totalPrice);      
+        setTotalPriceInCart(totalPriceInCart + info.totalPrice);    
         async function getInfosProductById() {
             try {
                 const result = await getProductsById(token, info.productId);
-                console.log(result);
                 setInfosProduct(result);
             } catch (err) {
                 console.log(err);
             }
         }
+          
         getInfosProductById();
 
 

@@ -30,9 +30,7 @@ export default function SignIn() {
       const token = JSON.parse(localStorage.getItem('myToken'));
       const { userId } = jwtDecode(token);
 
-    /*   toast.success("Login Efetuado com sucesso!", {
-        position: toast.POSITION.TOP_CENTER
-      }) */
+      
       const addressExists = await findByAddressId(token, userId);
       
       if(addressExists.length !== 0 ){
@@ -42,10 +40,10 @@ export default function SignIn() {
       }
       
     } catch (err) {
-      alert("Usuário ou senha inválidos!")
-      /* toast.error("Usuário ou senha inválidos!", {
+      /* alert("Usuário ou senha inválidos!") */
+      toast.error("Usuário ou senha inválidos!", {
         position: toast.POSITION.TOP_CENTER
-      }) */
+      })
 
     }
 

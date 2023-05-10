@@ -10,6 +10,7 @@ import jwtDecode from "jwt-decode";
 import UserContext from "../contexts/contextApi";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Products() {
     const token = JSON.parse(localStorage.getItem('myToken'));
@@ -18,16 +19,16 @@ export default function Products() {
     const [products, setProducts] = useState([]);
     const [idProduct, setIdProduct] = useState(0);
     const [infosProduct, setInfosProduct] = useState([]);
-    const [count, setCount] = useState(0);
+    const [count, setCount] = useState(1);
     const [amountProductInCart, setAmountProductInCart] = useState([]);
     const { userId } = jwtDecode(token);
-    const { setOriginPage} = useContext(UserContext);
+    const { setOriginPage, addressSelected } = useContext(UserContext);
     const navigate = useNavigate();
     let priceTotal = ((infosProduct.price) * count);
 
     useEffect(() => {
         setOriginPage(0);
-        
+
         async function getProductsTypeId() {
 
             try {
@@ -65,18 +66,18 @@ export default function Products() {
         }
         getProductsByUser();
 
-        
+
     }, [idProductType, amountProductInCart]);
 
 
-    
-    async function postInCart(e){
+
+    async function postInCart(e) {
         e.preventDefault();
-        try{
+        try {
             await postCart(Number(idProduct), userId, count, priceTotal, token);
             backScreen();
 
-        }catch(err){
+        } catch (err) {
             console.log(err);
             console.log("Algo deu errado, tente novamente");
         }
@@ -88,7 +89,11 @@ export default function Products() {
     };
 
     const decrement = () => {
-        setCount(count - 1);
+        if (count === 1) {
+
+        } else {
+            setCount(count - 1);
+        }
     };
 
     function backScreen() {
@@ -96,12 +101,22 @@ export default function Products() {
         setCount(0);
     }
 
+    function goToCartIfAddresExists(){
+        console.log(addressSelected.length);
+        if(addressSelected.length === 0){
+            toast.error("Você precisa selecionar um endereço para acessar o carrinho!", {
+                position: toast.POSITION.TOP_CENTER
+              })
+        }else{
+            navigate("/cart");
+        }
+    }
 
     return (<>
 
         <Container>
 
-            <AmountProduct  idProduct={idProduct}>
+            <AmountProduct idProduct={idProduct}>
                 <SelectProduct>
                     <Exit onClick={backScreen}>X</Exit>
                     <h1>{infosProduct.productName}</h1>
@@ -110,7 +125,7 @@ export default function Products() {
                         <h1>{count}</h1>
                         <button onClick={increment}>+</button>
                     </Counter>
-                    <TotalPrice>Preço Total: R$ {(priceTotal/100).toFixed(2).toString().replace('.', ',')}</TotalPrice>
+                    <TotalPrice>Preço Total: R$ {(priceTotal / 100).toFixed(2).toString().replace('.', ',')}</TotalPrice>
                     <button onClick={postInCart}>Adicionar ao Carrinho <FaShoppingCart /></button>
                 </SelectProduct>
             </AmountProduct>
@@ -124,10 +139,10 @@ export default function Products() {
                 {products.map((i) => <ProductsDivision key={i.id} i={i} setIdProduct={setIdProduct} setInfosProduct={setInfosProduct} />)}
             </ProductsByType>
 
-            <GoToCart onClick={()=> navigate("/cart")}><a>Itens no Carrinho ({amountProductInCart.length})</a><a>R${(amountProductInCart.reduce((sum, info) => { 
-                    let priceTotal = sum + info.totalPrice;
-                    return priceTotal;
-                    }, 0)/100).toFixed(2).toString().replace('.', ',')}</a></GoToCart>
+            <GoToCart onClick={goToCartIfAddresExists}><a>Ver Carrinho ({amountProductInCart.length})</a><a>R${(amountProductInCart.reduce((sum, info) => {
+                let priceTotal = sum + info.totalPrice;
+                return priceTotal;
+            }, 0) / 100).toFixed(2).toString().replace('.', ',')}</a></GoToCart>
 
         </Container>
     </>

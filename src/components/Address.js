@@ -3,27 +3,35 @@ import { IoIosArrowDown } from 'react-icons/io';
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../contexts/contextApi";
 import { Link } from "react-router-dom";
+import { BiExit } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 export default function Address() {
-    
+
+    const navigate = useNavigate();
     const { addressSelected } = useContext(UserContext);
-    
-    /* console.log(addressSelected); */
-    if(addressSelected.street === undefined ){
-        return(
-            <Link to={"/selectAddress"}><AddressContainer>
-            <AddressDetail>
-                <a>Selecione o Endereço </a> <Arrow><IoIosArrowDown /></Arrow>
-            </AddressDetail>
-        </AddressContainer></Link>)
-    } else{
-    return (
-        <Link to={"/selectAddress"}><AddressContainer>
-            <AddressDetail>
-                <a>{addressSelected.street }, {" " + addressSelected.number }, {" " + addressSelected.neighborhood} </a> <Arrow><IoIosArrowDown /></Arrow>
-            </AddressDetail>
-        </AddressContainer></Link>
-    )}
+
+    function exitApp(){
+        localStorage.clear();
+        navigate("/");
+    }
+
+    if (addressSelected.street === undefined) {
+        return (
+            <AddressContainer>
+                <Link to={"/selectAddress"}><AddressDetail>
+                    <a>Selecione o Endereço </a> <Arrow><IoIosArrowDown /></Arrow>
+                </AddressDetail></Link><BiExit onClick={exitApp} size={30} style={{ position: "absolute", right: '20', top: '22' }} />
+            </AddressContainer>)
+    } else {
+        return (
+            <AddressContainer>
+                <Link to={"/selectAddress"}><AddressDetail>
+                    <a>{addressSelected.street}, {" " + addressSelected.number}, {" " + addressSelected.neighborhood} </a> <Arrow><IoIosArrowDown /></Arrow>
+                </AddressDetail></Link><BiExit onClick={exitApp} size={30} style={{ position: "absolute", right: '20', top: '22' }} />
+            </AddressContainer>
+        )
+    }
 }
 
 const AddressContainer = styled.div`

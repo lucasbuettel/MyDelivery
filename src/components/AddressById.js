@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddressByid({ info }) {
     const { setAddressSelected } = useContext(UserContext);
-    const { originPage, setOriginPage } = useContext(UserContext);
+    const { originPage} = useContext(UserContext);
     const navigate = useNavigate();
 
     function adressSelected() {
