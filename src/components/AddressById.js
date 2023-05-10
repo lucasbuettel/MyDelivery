@@ -3,18 +3,25 @@ import styled from "styled-components";
 import UserContext from "../contexts/contextApi";
 import { useNavigate } from "react-router-dom";
 
-export default function AddressByid({info}){
-    const { addressSelected, setAddressSelected } = useContext(UserContext);
+export default function AddressByid({ info }) {
+    const { setAddressSelected } = useContext(UserContext);
+    const { originPage, setOriginPage } = useContext(UserContext);
     const navigate = useNavigate();
 
-    function adressSelected(){
+    function adressSelected() {
         setAddressSelected(info);
-        navigate("/products");
+        localStorage.setItem('addressSelected', JSON.stringify(info));
+        if (originPage === 0) {
+            navigate("/products");
+        }
+        if(originPage === 1){
+            navigate("/cart");
+        }
     }
 
-    return(
+    return (
         <ContainerAddress>
-            
+
             <AddressOptions onClick={adressSelected}>
                 <h1>{info.street}, {info.number}, {info.neighborhood}</h1>
             </AddressOptions>

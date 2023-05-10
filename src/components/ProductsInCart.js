@@ -1,9 +1,9 @@
 import styled from "styled-components"
-import photo from "../utils/photo"
 import { BsTrash } from "react-icons/bs"
 import { useEffect } from "react";
 import { getProductsById } from "../services/productApi";
 import { useState } from "react";
+import { deleteProductInCart } from "../services/cartApi";
 
 export function ProductsInCart({ info, setTotalPriceInCart, totalPriceInCart  }) {
     /* console.log(info) */
@@ -12,20 +12,30 @@ export function ProductsInCart({ info, setTotalPriceInCart, totalPriceInCart  })
     
     
     useEffect(() => {
-        setTotalPriceInCart(totalPriceInCart + info.totalPrice);
-        console.log(totalPriceInCart);
-        
+        setTotalPriceInCart(totalPriceInCart + info.totalPrice);      
         async function getInfosProductById() {
             try {
                 const result = await getProductsById(token, info.productId);
-                /* console.log(result); */
+                console.log(result);
                 setInfosProduct(result);
             } catch (err) {
                 console.log(err);
             }
         }
         getInfosProductById();
+
+
     }, []);
+
+    async function deleteProduct(){
+        try{
+            await deleteProductInCart(Number(info.id), token);
+            window.location.reload();
+        }catch(err){
+            console.log(err);
+        }
+    }
+
     return (
         <ProductBox>
             <ImageProduct>
@@ -36,7 +46,7 @@ export function ProductsInCart({ info, setTotalPriceInCart, totalPriceInCart  })
                 <Subtext>
                     <ProductPrice>R${(info.totalPrice/100).toFixed(2).toString().replace('.', ',')}</ProductPrice>
                     <Amount>Quantidade:{info.amountProduct}</Amount>
-                    <Trash><BsTrash size={30} /></Trash>
+                    <Trash onClick={deleteProduct}><BsTrash size={30} /></Trash>
 
                 </Subtext>
             </ProductOrder>

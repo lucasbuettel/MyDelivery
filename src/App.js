@@ -8,9 +8,12 @@ import Products from "./components/Products";
 import Cart from "./components/Cart";
 import { UserProvider } from "./contexts/contextApi";
 import SelectAddress from "./components/SelectAddress";
+import { ToastContainer } from "react-toastify";
 
 export default function App() {
   return (
+    <>
+    <ToastContainer/>
     <UserProvider>
       <BrowserRouter>
         <GlobalStyle />
@@ -24,6 +27,7 @@ export default function App() {
         </Routes>
       </BrowserRouter>
     </UserProvider>
+    </>
   );
 }
 

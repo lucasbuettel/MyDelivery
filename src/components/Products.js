@@ -5,9 +5,11 @@ import { useEffect, useState } from "react";
 import TypeOfProduct from "./TypeOfProduct";
 import ProductsDivision from "./ProductsDivision";
 import { FaShoppingCart } from "react-icons/fa";
-import { postCart } from "../services/cartApi";
+import { findProductByUserId, postCart } from "../services/cartApi";
 import jwtDecode from "jwt-decode";
-
+import UserContext from "../contexts/contextApi";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Products() {
     const token = JSON.parse(localStorage.getItem('myToken'));
@@ -17,10 +19,15 @@ export default function Products() {
     const [idProduct, setIdProduct] = useState(0);
     const [infosProduct, setInfosProduct] = useState([]);
     const [count, setCount] = useState(0);
+    const [amountProductInCart, setAmountProductInCart] = useState([]);
     const { userId } = jwtDecode(token);
+    const { setOriginPage} = useContext(UserContext);
+    const navigate = useNavigate();
     let priceTotal = ((infosProduct.price) * count);
 
     useEffect(() => {
+        setOriginPage(0);
+        
         async function getProductsTypeId() {
 
             try {
@@ -46,15 +53,27 @@ export default function Products() {
         }
         getProducts();
 
+        async function getProductsByUser() {
+            try {
+                const result = await findProductByUserId(token, userId);
+                setAmountProductInCart(result);
+            } catch (err) {
+                console.log(err);
+                console.log("Algo deu errado, tente novamente");
+            }
+
+        }
+        getProductsByUser();
+
         
-    }, [idProductType]);
+    }, [idProductType, amountProductInCart]);
 
 
     
     async function postInCart(e){
         e.preventDefault();
         try{
-            const result = await postCart(Number(idProduct), userId, count, priceTotal, token);
+            await postCart(Number(idProduct), userId, count, priceTotal, token);
             backScreen();
 
         }catch(err){
@@ -105,14 +124,38 @@ export default function Products() {
                 {products.map((i) => <ProductsDivision key={i.id} i={i} setIdProduct={setIdProduct} setInfosProduct={setInfosProduct} />)}
             </ProductsByType>
 
+            <GoToCart onClick={()=> navigate("/cart")}><a>Itens no Carrinho ({amountProductInCart.length})</a><a>R${(amountProductInCart.reduce((sum, info) => { 
+                    let priceTotal = sum + info.totalPrice;
+                    return priceTotal;
+                    }, 0)/100).toFixed(2).toString().replace('.', ',')}</a></GoToCart>
+
         </Container>
     </>
     )
 }
 
 const Container = styled.div`
-
+margin-bottom: 60px;
+margin-top: 100px;
 `;
+const GoToCart = styled.div`
+position: fixed;
+left: 0;
+bottom: 0;
+height: 60px;
+width: 100%;
+background-color: #f99d52;
+font-family: 'Roboto', sans-serif;
+display: flex;
+justify-content: space-around;
+align-items: center;
+
+a{
+    font-size: 20px;
+font-weight: 700;
+}
+
+`
 
 const AmountProduct = styled.div`
 position: fixed;

@@ -1,15 +1,13 @@
 import styled from "styled-components"
 import { IoIosArrowDown } from 'react-icons/io';
-import { findByAddressId } from "../services/addresApi";
-import jwtDecode from 'jwt-decode';
 import { useContext, useEffect, useState } from "react";
 import UserContext from "../contexts/contextApi";
 import { Link } from "react-router-dom";
-import AddressByid from "./AddressById";
 
 export default function Address() {
     
-    const { addressSelected, setAddressSelected } = useContext(UserContext);
+    const { addressSelected } = useContext(UserContext);
+    
     /* console.log(addressSelected); */
     if(addressSelected.street === undefined ){
         return(
@@ -29,7 +27,11 @@ export default function Address() {
 }
 
 const AddressContainer = styled.div`
+position: fixed;
+left: 0;
+top: 0;
     height: 80px;
+    width: 100%;
     background-color: #f99d52;
     display: flex;
     justify-content:center;

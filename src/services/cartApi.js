@@ -18,3 +18,15 @@ export async function findProductByUserId(token, userId) {
     });
     return response.data;
   };
+
+  export async function deleteProductInCart(productInCartId, token){
+    console.log(productInCartId);
+    const response = await api.delete("/cart", {
+      data: {productInCartId}, 
+      headers: {
+          Authorization: `Bearer ${token}`,
+      },
+  });
+  console.log(response.data)
+  return response.data;
+  };

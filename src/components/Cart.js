@@ -5,8 +5,10 @@ import { findProductByUserId } from "../services/cartApi";
 import jwtDecode from "jwt-decode";
 import { useState } from "react";
 import { ProductsInCart } from "./ProductsInCart";
+import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import UserContext from "../contexts/contextApi";
+import { BiArrowFromRight } from "react-icons/bi";
 
 
 export default function Cart() {
@@ -14,13 +16,18 @@ export default function Cart() {
     const { userId } = jwtDecode(token);
     const [productsInCart, setProductsInCart] = useState([]);
     const [totalPriceInCart, setTotalPriceInCart] = useState(0);
-    const { addressSelected, setAddressSelected } = useContext(UserContext);
-    console.log(addressSelected.street);
+    const navigate = useNavigate();
+    const address = JSON.parse(localStorage.getItem('addressSelected'));
+    const { setOriginPage, setAmountInCart } = useContext(UserContext);
+    
 
     useEffect(() => {
+        
         async function getProductsByUser() {
             try {
                 const result = await findProductByUserId(token, userId);
+                setOriginPage(1);
+                setAmountInCart(result.length)
                 setProductsInCart(result);
             } catch (err) {
                 console.log(err);
@@ -29,20 +36,20 @@ export default function Cart() {
 
         }
         getProductsByUser();
-    }, []);
+    }, [productsInCart]);
 
     return (
         <Container>
             <Header>
-                <a>Carrinho</a>
+                <BiArrowFromRight onClick={()=>navigate("/products")}/><a>Carrinho</a>
             </Header>
             <CartContains>
                 {productsInCart.map((info) => <ProductsInCart key={info.id} info={info} setTotalPriceInCart={setTotalPriceInCart} totalPriceInCart={totalPriceInCart} />)}
             </CartContains>
 
             <ConfirmAdress>
-                <ThisAddres>Está sendo enviado para esse endereço:
-                    <h1>{addressSelected.street} </h1> <Arrow><IoIosArrowDown /></Arrow>
+                <ThisAddres onClick={()=> navigate("/selectAddress")}>Está sendo enviado para esse endereço:
+                    <h1>{address.street}, {address.number}, {address.neighborhood} </h1> <Arrow><IoIosArrowDown /></Arrow>
                 </ThisAddres>
             </ConfirmAdress>
             <Total>

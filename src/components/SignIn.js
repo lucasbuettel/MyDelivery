@@ -15,12 +15,12 @@ export default function SignIn() {
   const [password, setPassword] = useState("");
   
   
-  const user = {
-    email, password
-  }
-
   async function postSession(e) {
     e.preventDefault();
+
+    const user = {
+      email, password
+    }
 
     try {
       const result = await signIn(user);
@@ -30,6 +30,9 @@ export default function SignIn() {
       const token = JSON.parse(localStorage.getItem('myToken'));
       const { userId } = jwtDecode(token);
 
+    /*   toast.success("Login Efetuado com sucesso!", {
+        position: toast.POSITION.TOP_CENTER
+      }) */
       const addressExists = await findByAddressId(token, userId);
       
       if(addressExists.length !== 0 ){
@@ -38,12 +41,11 @@ export default function SignIn() {
         navigate("/enrollment");
       }
       
-
     } catch (err) {
-      console.log(err);
-      toast.error("Ops, Algo Deu Errado!", {
+      alert("Usuário ou senha inválidos!")
+      /* toast.error("Usuário ou senha inválidos!", {
         position: toast.POSITION.TOP_CENTER
-      })
+      }) */
 
     }
 
